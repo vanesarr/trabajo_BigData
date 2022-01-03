@@ -1,0 +1,683 @@
+---
+title: "Evolución de la Universidad de Valencia"
+subtitle: "Vanesa Regueiro (varera@alumni.uv.es)" 
+author: "Universitat de València"
+date: "Diciembre de 2021 (actualizado el `r format(Sys.time(), '%d-%m-%Y')`)"
+output:
+  rmdformats::readthedown:
+    code_folding: hide
+editor_options: 
+  chunk_output_type: console
+  
+---
+
+```{r chunk-setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = TRUE, message = FALSE, warning = FALSE, 
+                      #results = "hold",
+                      cache = FALSE, cache.path = "/caches/", comment = "#>",
+                      #fig.width = 7, #fig.height= 7,   
+                      #out.width = 7, out.height = 7,
+                      collapse = TRUE,  fig.show = "hold",
+                      fig.asp = 0.628, out.width = "75%", fig.align = "center")
+```
+
+
+```{r options-setup, include = FALSE}
+options(scipen = 999) #- para quitar la notación científica
+options("yaml.eval.expr" = TRUE) 
+```
+
+
+```{r klippy, echo = FALSE}
+klippy::klippy(position = c("top", "right")) #- remotes::install_github("rlesur/klippy")
+```
+
+
+<hr class="linea-black">
+
+<!-- El párrafo de abajo has de dejarlo casi igual, solo HAS de SUSTITUIR "perezp44" por tu usuario de Github-->
+Trabajo elaborado para la asignatura "Programación y manejo de datos en la era del Big Data" de la Universitat de València durante el curso 2021-2022. El repo del trabajo está [aquí](https://github.com/vanesarr/trabajo_BigData){target="_blank"}. 
+
+<!-- El párrafo de abajo has de dejarlo exactamente igual, NO HAS DE CAMBIAR NADA-->
+
+La página web de la asignatura y los trabajos de mis compañeros pueden verse [aquí](https://perezp44.github.io/intro-ds-21-22-web/07-trabajos.html){target="_blank"}.
+
+<hr class="linea-red">
+
+# 1. Introducción
+
+Este trabajo consiste en un estudio de la **Universidad de Valencia**. Con este análisis se observarán distintas evoluciones donde se pretende mostrar visualmente como se ha desarrollado la UV a través de los años.
+
+Para hacer todo esto se pondrá en práctica lo estudiado en la asignatura de **Programación y manejo de datos en la era del Big Data** que se cursa en **CUARTO** de la carrera de **Economía** en la **UV**.
+
+![¿FUNCIONARÁ?](./imagenes/imagen01.jpg) 
+
+<hr class="linea-red">
+
+# 2. Datos
+
+Los datos que se van a utilizar durante el trabajo han sido sacados de la propia web de la **Universidad de Valencia**, en la bibliografia se encuentra el link directo. Asimismo, estos datos han sido bajados y actualizdoa a día *25 de diciembre de 2021*. 
+
+```{r packages-setup, include = FALSE}
+library(tidyverse)
+library(rio)
+library(klippy)
+library(knitr)
+#install.packages("rmdformats")
+library(cowplot)
+library(corrplot)
+library(highcharter)
+library("GGally")  
+require(scales)
+library(ggplot2)
+library(gapminder)
+library(ggthemes)
+library(gganimate)
+library(plotly)
+library(dplyr)
+library(data.table)
+library(lubridate)
+library(scales)
+library(countrycode)
+library(wordcloud2)
+#install.packages("paletteer")
+library("paletteer")
+library(gganimate)
+```
+
+## 2.1. Procesando los datos
+
+El trabajo se basa en los siguientes dataframes.
+
+```{r, eval = TRUE}
+
+datos1 <- here::here("datos", "PlazasOfertadas.csv")
+
+aa <- rio::import(datos1) #USADO
+
+datos2 <- here::here("datos", "ResidenciaFamiliarNuevosMatriculados.csv")
+
+bb <- rio::import(datos2) #USADO
+
+datos3 <- here::here("datos", "NúmeroMatriculados.csv")
+
+cc <- rio::import(datos3) #USADO
+
+datos4 <- here::here("datos", "NúmeroMatriculadosPorRama.csv") 
+
+dd <- rio::import(datos4) #USADO
+
+datos5 <- here::here("datos", "ModalidadIngreso.csv")
+
+ee <- rio::import(datos5) #USADO
+
+datos6 <- here::here("datos", "RangoEdadMatriculados.csv")
+
+ff <- rio::import(datos6) #USADO
+
+datos7 <- here::here("datos", "MatriculadosOtrosEstudios.csv")
+
+gg <- rio::import(datos7) #NO USADO PERO YA QUE LO PROCESE Y CAMBIE PARA PODER USARLO PUES LO DEJO PARA QUE SE VEA EL TRABAJO QUE HAY DETRÁS
+
+datos8 <- here::here("datos", "EstudiantesYTrabajo.csv")
+
+hh <- rio::import(datos8)
+
+datos9 <- here::here("datos", "EstudiosMadre.csv")
+
+ii <- rio::import(datos9) #USADO
+
+datos10 <- here::here("datos", "EstudiosPadre.csv")
+
+jj <- rio::import(datos10) #USADO
+
+datos11 <- here::here("datos", "TrabajoPadre.csv")
+
+kk <- rio::import(datos11) #USADO
+
+datos12 <- here::here("datos", "TrabajoMadre.csv")
+
+ll <- rio::import(datos12) #USADO
+
+datos13 <- here::here("datos", "NacionalidadEstudiante.csv") 
+
+mm <- rio::import(datos13) #USADO
+
+datos14 <- here::here("datos", "ResidenciaFamiliar.csv") #NO USADO PERO YA QUE LO PROCESE Y CAMBIE PARA PODER USARLO PUES LO DEJO PARA QUE SE VEA EL TRABAJO QUE HAY DETRÁS
+
+nn <- rio::import(datos14)
+
+datos15 <- here::here("datos", "ComarcasResidenciaFamiliar.csv") 
+
+oo <- rio::import(datos15) #NO USADO PERO YA QUE LO PROCESE Y CAMBIE PARA PODER USARLO PUES LO DEJO PARA QUE SE VEA EL TRABAJO QUE HAY DETRÁS
+
+datos16 <- here::here("datos", "1.2.14. Estudiants i estudiantes de grau per campus, centre i estudi per comarca i municipi familiar.csv") 
+
+pp <- rio::import(datos16)#NO USADO PERO YA QUE LO PROCESE Y CAMBIE PARA PODER USARLO PUES LO DEJO PARA QUE SE VEA EL TRABAJO QUE HAY DETRÁS
+
+datos17 <- here::here("datos", "TituladosPorRamaYCentro.csv")
+
+qq <- rio::import(datos17) #NO USADO PERO YA QUE LO PROCESE Y CAMBIE PARA PODER USARLO PUES LO DEJO PARA QUE SE VEA EL TRABAJO QUE HAY DETRÁS
+
+datos18 <- here::here("datos", "TituladosAñosEnGraduarse.csv")
+
+rr <- rio::import(datos18) #USADO
+
+datos19 <- here::here("datos", "PDI por rango de edad.csv") 
+
+ss <- rio::import(datos19) #USADO
+
+datos20 <- here::here("datos", "PAS por rango de edad.csv")
+
+tt <- rio::import(datos20) #USADO
+
+datos21 <- here::here("datos", "Personal en Investigación por rango de edat y tipo.csv")
+
+uu <- rio::import(datos21) #NO USADO
+```
+
+Porfa, valorar lo que me ha costado limpiar los datos
+
+<hr class="linea-red">
+
+# 3. Trabajos en los que te has basado
+
+El trabajo es elaboración propia. Lo más costoso ha sido limpiar los datos ya que al ser tantos dataframes. Tener que modificarlos ha sido muy duro pero ahora viene a lo que realmente veniamos... ¿La UV que tipo de alumnado tiene? ¿Ha aumentado el número de matriculados con los años? ¿Cuanto menor educación tienen los padres más tienden los hijos a educarse? Se intentará defender esas preguntas asi como otras. Cabe resaltar que este trabajo es únicamente para la asignatura y que no va a ser utilizado para nada más.
+
+> "Nadie dijo que sería fácil"
+
+# 4. Plazas ofertadas este año de nuevo ingreso por Campus.
+
+Como se muestra en el gráfico, el Campus dels Tarongers es el que más oferta de plazas tiene. A pesar de que el de Blasco sea el Campus más antiguo de la UV.
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+aadf <- aa %>%
+  filter(Centro == "Total") %>%
+  select(Campus, "a2020_2021")
+
+aaplot <- ggplot(aadf, aes(Campus, a2020_2021, fill=Campus)) +
+  geom_bar(stat = "identity", fill = paletteer_c("grDevices::SunsetDark", 3)) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  ggtitle("Matriculados año 2020-2021") + 
+  ylab("2020-2021")  + 
+  coord_flip()
+
+ggplotly(aaplot)
+```
+
+# 5. Número Matriculados.
+
+Para hacer una comparación más profunda, se observará el número de matriculados finalmente en cada campus.
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+ccdf <- cc %>%
+  filter(Centre == "Total") %>%
+  select(Campus, "Total")
+
+ccplot <- ggplot(ccdf, aes(Campus, Total, fill=Campus)) +
+  geom_bar(stat = "identity", fill = paletteer_c("grDevices::SunsetDark", 3)) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  ggtitle("Matriculados año 2020-2021") + 
+  ylab("2020-2021")  + 
+  coord_flip()
+
+ggplotly(ccplot)
+```
+
+Tras esto, se demuestra que existe cierta relación aunque no se muestre el número de años que el alumnado tarda en graduarse, etc... Con el dataframe se puede trabajar para ver como ha evolucionado la carrera en la que nos encontramos o muchas otras. También se distingue entre hombres y mujeres pero por falta de tiempo, no podré realizarlo.
+
+# 6. Residencia familiar.
+
+## 6. 1 <FONT COLOR="#a80828"> Top 10 Residencia Familiar Nuevos Matriculados </FONT>. {.tabset}
+### <FONT COLOR="FF4D00">2017-2018</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+bbdf <- bb %>% 
+  select(provincia, `2017-2018(Total)`) %>% 
+  slice_max(`2017-2018(Total)`, n = 10) 
+
+bbplot <- ggplot(bbdf, aes(provincia, `2017-2018(Total)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 10), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2017-2018 Procedencia Nuevos Matriculados") + coord_flip()
+
+ggplotly(bbplot)
+```
+### <FONT COLOR="FF4D00">2018-2019</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+bbdf1 <- bb %>% 
+  select(provincia, `2018-2019(Total)`) %>% 
+  slice_max(`2018-2019(Total)`, n = 10) 
+
+bbplot1 <- ggplot(bbdf1, aes(provincia, `2018-2019(Total)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 11), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2018-2019 Procedencia Nuevos Matriculados") + coord_flip()
+
+ggplotly(bbplot1)
+```
+### <FONT COLOR="FF4D00">2019-2020</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+bbdf2 <- bb %>% 
+  select(provincia, `2019-2020(Total)`) %>% 
+  slice_max(`2019-2020(Total)`, n = 10) 
+
+bbplot2 <- ggplot(bbdf2, aes(provincia, `2019-2020(Total)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 11), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2019-2020 Procedencia Nuevos Matriculados") + coord_flip()
+
+ggplotly(bbplot2)
+```
+### <FONT COLOR="FF4D00">2020-2021</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+bbdf3 <- bb %>% 
+  select(provincia, `2020-2021(Total)`) %>% 
+  slice_max(`2020-2021(Total)`, n = 10) 
+
+bbplot3 <- ggplot(bbdf3, aes(provincia, `2020-2021(Total)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 10), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2020-2021 Procedencia Nuevos Matriculados") + coord_flip()
+
+ggplotly(bbplot3)
+```
+
+## 6. 2. <FONT COLOR="#a80828"> Top 10 Residencia Familiar Matriculados en 2020 distinguiendo entre hombres y mujeres </FONT>. {.tabset} 
+
+### <FONT COLOR="FF4D00">TOTAL</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+nndf <- nn %>% 
+  select(provincia, `2020-2021(Total)`, `2020-2021(Mujer)`, `2020-2021(Hombre)`) %>% 
+  slice_max(`2020-2021(Total)`, n = 10) 
+
+nnplot <- ggplot(nndf, aes(provincia, `2020-2021(Total)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 10), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2020-2021 Procedencia Matriculados") + coord_flip()
+
+ggplotly(nnplot)
+```
+### <FONT COLOR="FF4D00">MUJER</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+nndf1 <- nn %>% 
+  select(provincia, `2020-2021(Total)`, `2020-2021(Mujer)`, `2020-2021(Hombre)`) %>% 
+  slice_max(`2020-2021(Mujer)`, n = 10) 
+
+nnplot1 <- ggplot(nndf1, aes(provincia, `2020-2021(Mujer)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 10), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2020-2021 Procedencia Mujeres Matriculadas") + coord_flip()
+
+ggplotly(nnplot1)
+```
+### <FONT COLOR="FF4D00">HOMBRE</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+nndf2 <- nn %>% 
+  select(provincia, `2020-2021(Total)`, `2020-2021(Mujer)`, `2020-2021(Hombre)`) %>% 
+  slice_max(`2020-2021(Hombre)`, n = 10) 
+
+nnplot2 <- ggplot(nndf2, aes(provincia, `2020-2021(Hombre)`, color = provincia)) +
+  geom_point(color = paletteer_c("viridis::magma", 10), alpha = 0.8) +
+  theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  ggtitle("2020-2021 Procedencia Hombres Matriculados") + coord_flip()
+
+ggplotly(nnplot2)
+```
+
+# 8. <FONT COLOR="#a80828"> Número Matriculados Por Rama </FONT>. {.tabset} 
+
+## <FONT COLOR="FF4D00">TOTAL</FONT>
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+hpolar <- function(x, a, c, z) (
+  highchart() %>% 
+  hc_chart(polar = TRUE) %>% 
+  hc_title(text = x) %>% 
+  hc_xAxis(categories = a,
+           tickmarkPlacement = "on",
+           lineWidth = 0) %>% 
+  hc_yAxis(gridLineInterpolation = "polygon",
+           lineWidth = 0,
+           min = 0) %>% 
+  hc_series(list(name = z,
+                 data = c,
+                 pointPlacement = "on",
+                 type = "column",
+                 color = '#a80828'))   )    
+```   
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+dddf <- dd %>% 
+  filter(Centre == "Total") %>% 
+  select(Rama, Mujer, Hombre, Total) 
+
+hpolar('Número de matriculados', dddf$Rama, dddf$Total,  'Por Rama')
+```
+
+## <FONT COLOR="FF4D00">MUJER</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+hpolar('Número de matriculados', dddf$Rama, dddf$Mujer,  'Por Rama')
+```
+
+## <FONT COLOR="FF4D00">HOMBRE</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+hpolar('Número de matriculados', dddf$Rama, dddf$Hombre,  'Por Rama')
+```
+
+# 9. Evolución Modalidad de Ingreso diferenciando entre hombres y mujeres
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+eelong <- ee %>% pivot_longer(cols = 2:13, names_to = "periodo")
+
+eedf <- eelong %>%
+  drop_na() %>%
+  group_by(Ingreso, periodo)  %>%
+  summarise(matriculados = sum(value)) %>%
+  group_by(periodo) %>%
+  slice_max(matriculados, n = 28)
+
+eeplot <- ggplot(eedf, aes(matriculados, Ingreso, colour = Ingreso)) +
+  geom_point(alpha = 1/2) +
+  scale_size(range = c(4, 14)) +
+  scale_x_log10() + 
+  theme_minimal() + 
+  theme(axis.text.x=element_blank(), axis.ticks.x =element_blank(), axis.text.y=element_blank(), axis.ticks.y =element_blank(), legend.position = "none")+
+  labs(title = "Evolución Modalidad de Ingreso") +
+  facet_wrap(~periodo) 
+
+ggplotly(eeplot)
+```
+# 10. <FONT COLOR="#a80828"> Rango de Edades </FONT>. {.tabset} 
+
+Aquí el problema es que los datos proceden de dataframes distintos.
+
+## <FONT COLOR="FF4D00">ALUMNADO</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+fflong <- ff %>% 
+  pivot_longer(cols = 2:13, names_to = "periodo")
+
+fflong <- fflong %>% 
+  filter(periodo %in% c("2017", "2018", "2019", "2020")) %>% group_by(Edad, periodo) %>% mutate(alumnos = sum(value))
+
+ffplot <- ggplot(fflong, aes(x = periodo, y = alumnos, group = Edad,color = Edad)) +
+  geom_point(alpha = 0.8,color = paletteer_c("ggthemes::Sunset-Sunrise Diverging", 72)) +
+  geom_line(alpha = 0.2) +
+  labs(title = "Rango De Edad Alumnado") + theme_minimal()
+
+ggplotly(ffplot)
+```
+
+## <FONT COLOR="FF4D00">PDI</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+sslong <- ss %>% 
+  pivot_longer(cols = 2:13, names_to = "periodo")
+
+sslong <- sslong %>% 
+  filter(periodo %in% c("2017", "2018", "2019", "2020")) %>% group_by(edad, periodo) %>% mutate(PDI = sum(value))
+
+ssplot <- ggplot(sslong, aes(x = periodo, y = PDI, group = edad,color = edad)) +
+  geom_point(alpha = 0.8,color = paletteer_c("ggthemes::Sunset-Sunrise Diverging", 40)) +
+  geom_line(alpha = 0.2) +
+  labs(title = "Rango De Edad PDI") + theme_minimal()
+
+ggplotly(ssplot)
+```
+
+## <FONT COLOR="FF4D00">PAS</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+ttlong <- tt %>% 
+  pivot_longer(cols = 2:13, names_to = "periodo")
+
+ttlong <- ttlong %>% 
+  filter(periodo %in% c("2017", "2018", "2019", "2020")) %>% group_by(edad, periodo) %>% mutate(PAS = sum(value))
+
+ttplot <- ggplot(ttlong, aes(x = periodo, y = PAS, group = edad,color = edad)) +
+  geom_point(alpha = 0.8,color = paletteer_c("ggthemes::Sunset-Sunrise Diverging", 40)) +
+  geom_line(alpha = 0.2) +
+  labs(title = "Rango De Edad PAS") + theme_minimal()
+
+ggplotly(ttplot)
+```
+
+# 11. <FONT COLOR="#a80828"> ¿Cuánto tardan los titulados en graduarse? </FONT>. {.tabset} 
+
+## <FONT COLOR="FF4D00">TOTAL</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+rrlong <- rr %>% 
+  pivot_longer(cols = 2:13, names_to = "year")
+
+rrlong <- rrlong %>% 
+  filter(year %in% c("2017", "2018", "2019", "2020")) %>% group_by(tiempo, year) %>% mutate(Graduados = sum(value))
+
+rrlong$Graduados <- as.numeric(as.character(rrlong$Graduados))
+rrlong$year <- as.numeric(as.character(rrlong$year))
+
+rrplot <- ggplot(rrlong, aes(x = year, y = Graduados, group = tiempo,color = tiempo)) +
+  geom_point(color = paletteer_c("grDevices::rainbow", 44)) +
+  geom_line() + 
+  theme_minimal() + 
+  transition_reveal(year) 
+
+animate(rrplot, 90, 5)
+```
+
+## <FONT COLOR="FF4D00">MUJERES</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+rrlong1 <- rr %>% 
+  pivot_longer(cols = 2:13, names_to = "year")
+
+rrlong1 <- rrlong1 %>% 
+  filter(year %in% c("2017Mujer", "2018Mujer", "2019Mujer", "2020Mujer")) %>% group_by(tiempo, year) %>% mutate(Graduados = sum(value))
+
+rrlong1 <- rrlong1 %>% mutate(year = str_replace(year, "Mujer", "" ))
+
+rrlong1$Graduados <- as.numeric(as.character(rrlong1$Graduados))
+rrlong1$year <- as.numeric(as.character(rrlong1$year))
+
+rrplot1 <- ggplot(rrlong1, aes(x = year, y = Graduados, group = tiempo,color = tiempo)) +
+  geom_point(color = paletteer_c("grDevices::rainbow", 44)) +
+  geom_line() + 
+  theme_minimal() + 
+  transition_reveal(year) 
+
+animate(rrplot1, 90, 5)
+```
+
+## <FONT COLOR="FF4D00">HOMBRES</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+rrlong2 <- rr %>% 
+  pivot_longer(cols = 2:13, names_to = "year")
+
+rrlong2 <- rrlong2 %>% 
+  filter(year %in% c("2017Hombre", "2018Hombre", "2019Hombre", "2020Hombre")) %>% group_by(tiempo, year) %>% mutate(Graduados = sum(value))
+
+rrlong2 <- rrlong2 %>% mutate(year = str_replace(year, "Hombre", "" ))
+
+rrlong2$Graduados <- as.numeric(as.character(rrlong2$Graduados))
+rrlong2$year <- as.numeric(as.character(rrlong2$year))
+
+rrplot2 <- ggplot(rrlong2, aes(x = year, y = Graduados, group = tiempo,color = tiempo)) +
+  geom_point(color = paletteer_c("grDevices::rainbow", 44)) +
+  geom_line() + 
+  theme_minimal() + 
+  transition_reveal(year) 
+
+animate(rrplot2, 90, 5)
+```
+
+# 12. Nacionalidad del estudiantado de la UV
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+mm <- mm %>%
+  select(`Nacionalidad`,`2017`,`2018`,`2019`,`2020`)
+
+mmlong <- mm %>% pivot_longer(cols = 2:5, names_to = "periodo")
+
+mmdf <- mmlong %>%
+  drop_na() %>%
+  group_by(Nacionalidad, periodo)  %>%
+  summarise(matriculados = sum(value)) 
+
+mmplot <- ggplot(mmdf, aes(matriculados, Nacionalidad, group=Nacionalidad, colour = Nacionalidad)) +
+  geom_point(alpha = 1/2) +
+  scale_size(range = c(4, 14)) +
+  scale_x_log10() + 
+  theme_minimal() + 
+  theme(axis.text.x=element_blank(), axis.ticks.x =element_blank(), axis.text.y=element_blank(), axis.ticks.y =element_blank(), legend.position = "none")+
+  labs(title = "Evolución Nacionalidad") +
+  facet_wrap(~periodo) 
+
+ggplotly(mmplot)
+```
+
+10 países con más matriculados en la UV
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE}
+mm <- mm %>%
+  select(`Nacionalidad`,`2017`,`2018`,`2019`,`2020`) %>% slice_max(`2020`, n=10)
+
+mmlong <- mm %>% pivot_longer(cols = 2:5, names_to = "periodo")
+
+mmdf <- mmlong %>%
+  drop_na() %>%
+  group_by(Nacionalidad, periodo)  %>%
+  summarise(matriculados = sum(value)) 
+
+mmplot <- ggplot(mmdf, aes(matriculados, Nacionalidad, group=Nacionalidad, colour = Nacionalidad)) +
+  geom_point(alpha = 1/2) +
+  scale_size(range = c(4, 14)) +
+  scale_x_log10() + 
+  theme_minimal() + 
+  theme(axis.text.x=element_blank(), axis.ticks.x =element_blank(), axis.text.y=element_blank(), axis.ticks.y =element_blank(), legend.position = "none")+
+  labs(title = "Evolución Nacionalidad") +
+  facet_wrap(~Nacionalidad) 
+
+ggplotly(mmplot)
+```
+
+# 13. <FONT COLOR="#a80828"> ESTUDIOS FAMILIARES </FONT>. {.tabset}
+
+## <FONT COLOR="FF4D00">PADRE</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE} 
+jjdf <- jj %>%
+select(`estudios`,`2020`) 
+
+jjdf <- jjdf %>%
+head(jjdf, n = 10) %>%
+arrange(desc(`2020`))
+
+jjdf$`2020` <- as.numeric(as.character(jjdf$`2020`))
+
+jjplot <- ggplot(jjdf, aes(`estudios`,`2020`)) + 
+  geom_point(color = paletteer_c("grDevices::Emrld", 10)) + 
+  geom_segment(aes(x=forcats::fct_reorder(`estudios`,`2020`, .desc = TRUE),
+                   xend=forcats::fct_reorder(`estudios`,`2020`, .desc = TRUE),
+                   y=0,
+                   yend=`2020`, color = estudios )) + 
+  geom_smooth(method = "lm", position = "identity") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(title = "Padre 2020", 
+              x = "Estudios") +
+  theme(legend.position="none") + coord_flip()
+
+ggplotly(jjplot) 
+```
+
+## <FONT COLOR="FF4D00">MADRE</FONT>
+
+```{r, echo = TRUE, eval = TRUE, warning=FALSE} 
+iidf <- ii %>%
+select(`estudios`,`2020`) 
+
+iidf <- iidf %>%
+head(iidf, n = 10) %>%
+arrange(desc(`2020`))
+
+iidf$`2020` <- as.numeric(as.character(iidf$`2020`))
+
+iiplot <- ggplot(iidf, aes(`estudios`,`2020`)) + 
+  geom_point(color = paletteer_c("grDevices::Emrld", 10)) + 
+  geom_segment(aes(x=forcats::fct_reorder(`estudios`,`2020`, .desc = TRUE),
+                   xend=forcats::fct_reorder(`estudios`,`2020`, .desc = TRUE),
+                   y=0,
+                   yend=`2020`, color = estudios )) + 
+  geom_smooth(method = "lm", position = "identity") +
+  theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank()) +
+  labs(title = "Madre 2020", 
+              x = "Estudios") +
+  theme(legend.position="none") + coord_flip()
+
+ggplotly(iiplot) 
+```
+
+# 14. <FONT COLOR="#a80828"> TRABAJO FAMILIARES </FONT>. {.tabset}
+
+## <FONT COLOR="FF4D00">PADRE</FONT>
+
+```{r}
+
+kkdf <- kk %>%
+  drop_na() %>%
+  select(trabajo, '2020') 
+
+kkplot <- wordcloud2(data = kkdf, size = 0.1,color = paletteer_c("grDevices::rainbow", 20))
+
+kkplot
+```
+
+## <FONT COLOR="FF4D00">MADRE</FONT>
+
+```{r}
+
+lldf <- ll %>%
+  select(trabajo, '2020') 
+
+llplot <- wordcloud2(data = lldf, size = 0.1,color = paletteer_c("grDevices::rainbow", 20))
+
+llplot
+```
+
+# 15. Bibliografía
+
+- [Página web de la asignatura.](https://perezp44.github.io/intro-ds-21-22-web/04-tutoriales.html)
+
+- [Página web de la universidad.](https://www.uv.es/)
+
+<br><br>
+
+<hr class="linea-red">
+<hr class="linea-red">
+
+# 16. Sesión Informativa 
+
+```{r, echo = FALSE}
+sessioninfo::session_info() %>% details::details(summary = 'Información de mi R-sesión:') 
+```
+
+<br><br>
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
+<br><br>
+
+<div class="tocify-extend-page" data-unique="tocify-extend-page" style="height: 0;"></div>
